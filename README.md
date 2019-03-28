@@ -1,6 +1,6 @@
 # oracle-apex-ords
 
-## DOWNLOAD SOFTWARE FROM OTN.ORACLE.COM (you need a login account)
+## Download software from otn.oracle.com (you need a login account)
 
 https://www.oracle.com/database/technologies/appdev/apex.html
 
@@ -8,7 +8,7 @@ https://www.oracle.com/database/technologies/appdev/apex.html
 mkdir downloads
 ```
 
-## SET ENVIRONMENT
+## Set environment
 
 ```bash
 DATABASE_VERSION=18.4.0
@@ -17,7 +17,7 @@ ORDS_VERSION=18.4.0.354.1002
 ORDS_PORT=8080
 ```
 
-## UNPACK SOFTWARE
+## Unpack software
 
 ```bash
 # create folders for the three components (ORACLE DATABASE, APEX, ORDS)
@@ -32,7 +32,7 @@ chmod 777 oradata
 unzip ~/docker/oracle-apex-ords/downloads/apex_${APEX_VERSION}.zip -d ~/docker/oracle-apex-ords/apex/${APEX_VERSION} &
 ```
 
-## BUILD ORACLE DATABASE IMAGE
+## Build Oracle Database image
 
 ### do we have our images ready?
 ```bash
@@ -54,7 +54,7 @@ cd ./docker-images/OracleDatabase/SingleInstance/dockerfiles/
 ./buildDockerImage.sh -v ${DATABASE_VERSION} -x
 ```
 
-## BUILD APACHE TOMCAT IMAGE
+## Build Apache Tomcat image
 
 ### build the ords container with the recipe from Martin D Souza
 ```bash
@@ -63,27 +63,26 @@ git clone https://github.com/martindsouza/docker-ords.git .
 ```
 ### copy in the ords.war file
 ```bash
-unzip ../downloads/ords-18.3.0.270.1456.zip -d ./docker-ords/ords.war
+unzip ../downloads/ords-${ORDS_VERSION}.zip -d ./docker-ords/ords.war
 cd docker-ords
 ```
 ### now build!
 ```bash
-docker build -t ords:$ORDS_VERSION .
+docker build -t ords:${ORDS_VERSION} .
 ```
 
-## ORACLE DATABASE
+## Oracle Database
 
 ### create database. It will take a while...
 ```bash
 docker-compose up database
+# Ctrl+C to stop the database after "DATABASE IS READY TO USE"
 ```
-### Ctrl+C to stop the database after "DATABASE IS READY TO USE"
 ### now start the database in detached mode
 ```bash
 docker-compose up -d database
 ```
-### make sure health is fine.
-### if not, perform a restart: "docker-compose restart database"
+### make sure health is fine. if not, perform a restart: "docker-compose restart database"
 ```bash
 docker-compose ps
 ```
@@ -97,7 +96,7 @@ sqlplus system/oracle@localhost:1521/XE
 sqlplus system/oracle@localhost:1521/XEPDB1
 ```
 
-## INSTALL APEX IN XEPDB1
+## Install APEX in pluggable database XEPDB1
 
 ```bash
 cd ./apex/${APEX_VERSION}/apex
@@ -105,7 +104,7 @@ sqlplus "sys/oracle@localhost:1521/XEPDB1 as sysdba" @./../../../install_apex.sq
 cd ./../../../
 ```
 
-## CONFIGURE ORDS
+## Configure ORDS
 
 ### create the configuration folder for given ORDS version
 ```bash
@@ -115,8 +114,8 @@ mkdir -p ./ords/ords-${ORDS_VERSION}/config
 ### OnOff. Generate ORDS configuration
 ```bash
 docker-compose up create-ords-config
+# Ctrl+C after the log says "Started"
 ```
-### Ctrl+C
 ### start application (Tomcat configured with ORDS)
 ```bash
 docker-compose up -d app
@@ -129,14 +128,10 @@ docker-compose up -d app
 open http://localhost:8080/ords
 ```
 
-## CLEANUP
+## Cleanup
 
 ```bash
 docker-compose down -v
 rm -rf ./oradata/*
 rm -rf ./ords/ords-${ORDS_VERSION}
 ```
-
-
-
-h
