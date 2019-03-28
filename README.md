@@ -34,11 +34,6 @@ unzip ~/docker/oracle-apex-ords/downloads/apex_${APEX_VERSION}.zip -d ~/docker/o
 
 ## Build Oracle Database image
 
-### do we have our images ready?
-```bash
-docker image ls | grep -E 'oracle|ords'
-```
-
 ### oracle database. Let's build on Gerald Venzl work...
 ```bash
 git clone https://github.com/oracle/docker-images.git
@@ -69,6 +64,11 @@ cd docker-ords
 ### now build!
 ```bash
 docker build -t ords:${ORDS_VERSION} .
+```
+
+### do we have our images ready?
+```bash
+docker image ls | grep -E 'oracle|ords'
 ```
 
 ## Oracle Database
