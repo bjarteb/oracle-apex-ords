@@ -52,11 +52,12 @@ git clone https://github.com/oracle/docker-images.git
 ```bash
 cp ./downloads/oracle-database-xe-18c-1.0-1.x86_64.rpm \
    ./docker-images/OracleDatabase/SingleInstance/dockerfiles/${DATABASE_VERSION}
-cd ./docker-images/OracleDatabase/SingleInstance/dockerfiles/
+pushd ./docker-images/OracleDatabase/SingleInstance/dockerfiles/
 ```
 ### build the image. This is going to take a while... (10 minutes)
 ```bash
 ./buildDockerImage.sh -v ${DATABASE_VERSION} -x
+popd
 ```
 
 ## Build serverjre image
@@ -65,22 +66,24 @@ Note! We will first have to build the `oracle/serverjre:8` image before we can b
 
 [Download Server JRE 8](http://www.oracle.com/technetwork/java/javase/downloads/server-jre8-downloads-2133154.html) `.tar.gz` file and drop it inside folder `java-8`.
 ```bash
-cp ./downloads/server-jre-8u202-linux-x64.tar.gz ./OracleJava/java-8
+cp ./downloads/server-jre-8u202-linux-x64.tar.gz ./docker-images/OracleJava/java-8
 ```
 # build the image
 ```bash
-cd java-8
+pushd ./docker-images/OracleJava/java-8
 docker build -t oracle/serverjre:8 .
+popd
 ```
 ## Build the ORDS image (based on the oracle/serverjre:8 image)
 
 ```bash
-cd OracleRestDataServices/dockerfiles
-cp ./downloads/ords-${ORDS_VERSION}.zip . 
+cp ./downloads/ords-${ORDS_VERSION}.zip ./docker-images/OracleRestDataServices/dockerfiles
 ```
 ### build image (-i ignore checksum)
 ```bash
+pushd ./docker-images/OracleRestDataServices/dockerfiles 
 ./buildDockerImage.sh -i
+popd
 ```
 
 ### do we have our images ready?
@@ -121,9 +124,9 @@ sqlplus system/oracle@localhost:1521/XEPDB1
 ## Install APEX in pluggable database XEPDB1
 
 ```bash
-cd ./apex/${APEX_VERSION}/apex
+pushd ./apex/${APEX_VERSION}/apex
 sqlplus "sys/oracle@localhost:1521/XEPDB1 as sysdba" @./../../../install_apex.sql
-cd ./../../../
+popd
 ```
 
 ## Configure ORDS
