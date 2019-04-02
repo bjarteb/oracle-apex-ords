@@ -1,4 +1,4 @@
-version: '2.2'
+version: '3.7'
 
 services:
 
@@ -16,58 +16,41 @@ services:
       - dbnet
     init: true
     healthcheck:
-      test: sql -L -S sys/oracle@localhost:1521/XE as sysdba < /dev/null |grep 'ORA-'; if [[ $$? == 1 ]]; then echo 0; else echo 1; fi
-      interval: 2m
-      timeout: 30s
+      test: sql -L -S sys/oracle@localhost:1521/XEPDB1 as sysdba < /dev/null |grep 'ORA-'; if [[ $$? == 1 ]]; then echo 0; else echo 1; fi
+      interval: 1m
+      timeout: 10s
       retries: 20
-
-  create-ords-config:
-    env_file: .env
-    image: ords:${ORDS_VERSION}
-    container_name: create-ords-config
-    environment:
-      - TZ=Europe/Oslo
-      - DB_HOSTNAME=database
-      - DB_PORT=1521
-      - DB_SERVICENAME=XEPDB1
-      - APEX_PUBLIC_USER_PASS=oracle
-      - APEX_LISTENER_PASS=oracle
-      - APEX_REST_PASS=oracle
-      - ORDS_PASS=oracle
-      - SYS_PASS=oracle
-    init: true
-    volumes:
-      - ords-config:/opt/ords
-    networks:
-      - dbnet
+      start_period: 40s
 
   app:
     env_file: .env
-    image: ords:${ORDS_VERSION}
-    container_name: ords
+    image: oracle/restdataservices:18.4.0
+    container_name: app
     environment:
       - TZ=Europe/Oslo
-      - DB_HOSTNAME=database
-      - DB_PORT=1521
-      - DB_SERVICENAME=XEPDB1
-      - APEX_PUBLIC_USER_PASS=oracle
-      - APEX_LISTENER_PASS=oracle
-      - APEX_REST_PASS=oracle
-      - ORDS_PASS=oracle
-      - SYS_PASS=oracle
+      - ORACLE_HOST=database
+      - ORACLE_PORT=1521
+      - ORACLE_SERVICE=XEPDB1
+      - ORACLE_PWD=oracle
+      - ORDS_PWD=oracle
+    init: true
     volumes:
-      - ords-config:/opt/ords
-      - apex-images:/ords/apex-images
+      - ords-config:/opt/oracle/ords/config/ords
+      - apex-images:/opt/oracle/ords/doc_root/i
     ports:
-      - 8080:8080
+      - 8888:8888
     networks:
       - dbnet
     init: true
     restart: on-failure
-  wait_until_ready:
-    image: oracle/database:18.4.0-xe
-    command: /usr/bin/true
-    depends_on: {"database": {"condition": "service_healthy"}}
+    depends_on:
+      - database
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/ords"]
+      interval: 30s
+      timeout: 10s
+      retries: 100
+      start_period: 40s
 
 networks:
   dbnet:
