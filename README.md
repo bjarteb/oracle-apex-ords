@@ -3,6 +3,15 @@
 ## Download software from otn.oracle.com (you need a login account)
 
 https://www.oracle.com/database/technologies/appdev/apex.html
+http://www.oracle.com/technetwork/java/javase/downloads/server-jre8-downloads-2133154.html
+
+### Download list
+
+- Oracle Database Express Edition 18c (XE)
+- Oracle Application Express (APEX)
+- Oracle REST Data Services (ORDS)
+- Oracle Java JRE Server (ServerJRE)
+
 
 ```bash
 mkdir downloads
@@ -12,9 +21,9 @@ mkdir downloads
 
 ```bash
 DATABASE_VERSION=18.4.0
-APEX_VERSION=18.2
+APEX_VERSION=19.1
 ORDS_VERSION=18.4.0.354.1002
-ORDS_PORT=8080
+ORDS_PORT=8888
 ```
 
 ## Unpack software
@@ -29,7 +38,8 @@ chmod 777 oradata
 ## unpack APEX in the background (it takes a while)
 
 ```bash
-unzip ~/docker/oracle-apex-ords/downloads/apex_${APEX_VERSION}.zip -d ~/docker/oracle-apex-ords/apex/${APEX_VERSION} &
+mkdir ./apex/${APEX_VERSION} || true
+unzip ./downloads/apex_${APEX_VERSION}.zip -d ./apex/${APEX_VERSION} &
 ```
 
 ## Build Oracle Database image
@@ -49,26 +59,38 @@ cd ./docker-images/OracleDatabase/SingleInstance/dockerfiles/
 ./buildDockerImage.sh -v ${DATABASE_VERSION} -x
 ```
 
-## Build Apache Tomcat image
+## Build serverjre image
 
-### build the ords container with the recipe from Martin D Souza
+Note! We will first have to build the `oracle/serverjre:8` image before we can build the ORDS image!
+
+[Download Server JRE 8](http://www.oracle.com/technetwork/java/javase/downloads/server-jre8-downloads-2133154.html) `.tar.gz` file and drop it inside folder `java-8`.
 ```bash
-cd ords
-git clone https://github.com/martindsouza/docker-ords.git .
+cp ./downloads/server-jre-8u202-linux-x64.tar.gz ./OracleJava/java-8
 ```
-### copy in the ords.war file
+# build the image
 ```bash
-unzip ../downloads/ords-${ORDS_VERSION}.zip -d ./docker-ords/ords.war
-cd docker-ords
+cd java-8
+docker build -t oracle/serverjre:8 .
 ```
-### now build!
+## Build the ORDS image (based on the oracle/serverjre:8 image)
+
 ```bash
-docker build -t ords:${ORDS_VERSION} .
+cd OracleRestDataServices/dockerfiles
+cp ./downloads/ords-${ORDS_VERSION}.zip . 
+```
+### build image (-i ignore checksum)
+```bash
+./buildDockerImage.sh -i
 ```
 
 ### do we have our images ready?
 ```bash
-docker image ls | grep -E 'oracle|ords'
+docker image ls | grep -E 'oracle\/database|oraclelinux|oracle\/restdataservices|oracle\/serverjre'
+
+oracle/restdataservices                             18.4.0              49c6a8970304        About an hour ago   391MB
+oracle/serverjre                                    8                   93bf34de0c2e        3 days ago          269MB
+oracle/database                                     18.4.0-xe           40c73fce6868        2 weeks ago         8.57GB
+oraclelinux                                         7-slim              c3d869388183        2 months ago        117MB
 ```
 
 ## Oracle Database
@@ -111,21 +133,16 @@ cd ./../../../
 mkdir -p ./ords/ords-${ORDS_VERSION}/config
 ```
 
-### OnOff. Generate ORDS configuration
-```bash
-docker-compose up create-ords-config
-# Ctrl+C after the log says "Started"
-```
-### start application (Tomcat configured with ORDS)
+### start application
 ```bash
 docker-compose up -d app
 ```
 
-## VIOLA! Point your browser to: http://localhost:8080/ords
+## VIOLA! Point your browser to: http://localhost:8888/ords
 ## Workspace: INTERNAL, Username: ADMIN, Password: Welcome1
 
 ```bash
-open http://localhost:8080/ords
+open http://localhost:8888/ords
 ```
 
 ## Cleanup
