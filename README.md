@@ -2,8 +2,8 @@
 
 ## Download software from otn.oracle.com (you need a login account)
 
-https://www.oracle.com/database/technologies/appdev/apex.html
-http://www.oracle.com/technetwork/java/javase/downloads/server-jre8-downloads-2133154.html
+- https://www.oracle.com/database/technologies/appdev/apex.html
+- http://www.oracle.com/technetwork/java/javase/downloads/server-jre8-downloads-2133154.html
 
 ### Download list
 
