@@ -9,7 +9,9 @@ services:
       - TZ=Europe/Oslo
       - ORACLE_PWD=oracle
     volumes:
-      - oradata:/opt/oracle/oradata
+      - type: volume
+        source: oradata
+        target: /opt/oracle/oradata
     ports:
       - 1521:1521
     networks:
@@ -59,15 +61,18 @@ volumes:
    oradata:
      driver: local
      driver_opts:
+       type: none
        device: $PWD/oradata
        o: bind
    apex-images:
      driver: local
      driver_opts:
+       type: none
        device: $PWD/apex/${APEX_VERSION}/apex/images
        o: bind
    ords-config:
      driver: local
      driver_opts:
+       type: none
        device: $PWD/ords/ords-${ORDS_VERSION}/config
        o: bind
