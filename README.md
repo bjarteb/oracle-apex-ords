@@ -13,6 +13,8 @@
 - Oracle Java JRE Server (ServerJRE)
 
 
+## Create download area
+
 ```bash
 mkdir downloads
 ```
@@ -21,8 +23,8 @@ mkdir downloads
 
 ```bash
 DATABASE_VERSION=18.4.0
-APEX_VERSION=19.1
-ORDS_VERSION=19.1.0.092.1545
+APEX_VERSION=19.2
+ORDS_VERSION=19.2.0.199.1647
 ORDS_PORT=8888
 ```
 
@@ -66,7 +68,7 @@ Note! We will first have to build the `oracle/serverjre:8` image before we can b
 
 [Download Server JRE 8](http://www.oracle.com/technetwork/java/javase/downloads/server-jre8-downloads-2133154.html) `.tar.gz` file and drop it inside folder `java-8`.
 ```bash
-cp ./downloads/server-jre-8u202-linux-x64.tar.gz ./docker-images/OracleJava/java-8
+cp ./downloads/server-jre-8u221-linux-x64.tar.gz ./docker-images/OracleJava/java-8
 ```
 # build the image
 ```bash
@@ -81,7 +83,7 @@ cp ./downloads/ords-${ORDS_VERSION}.zip ./docker-images/OracleRestDataServices/d
 ```
 ### build image (-i ignore checksum)
 ```bash
-pushd ./docker-images/OracleRestDataServices/dockerfiles 
+pushd ./docker-images/OracleRestDataServices/dockerfiles
 ./buildDockerImage.sh -i
 popd
 ```
