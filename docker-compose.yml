@@ -26,21 +26,24 @@ services:
 
   app:
     env_file: .env
-    image: oracle/restdataservices:18.4.0
+    image: oracle-ords:${ORDS_VERSION}
     container_name: app
     environment:
       - TZ=Europe/Oslo
-      - ORACLE_HOST=database
-      - ORACLE_PORT=1521
-      - ORACLE_SERVICE=XEPDB1
-      - ORACLE_PWD=oracle
-      - ORDS_PWD=oracle
+      - DB_HOSTNAME=database
+      - DB_PORT=1521
+      - DB_SERVICENAME=XEPDB1
+      - APEX_PUBLIC_USER_PASS=oracle
+      - APEX_LISTENER_PASS=oracle
+      - APEX_REST_PASS=oracle
+      - ORDS_PASS=oracle
+      - SYS_PASS=oracle
     init: true
     volumes:
-      - ords-config:/opt/oracle/ords/config/ords
-      - apex-images:/opt/oracle/ords/doc_root/i
+      - ords-config:/opt/ords
+      - apex-images:/ords/apex-images
     ports:
-      - 8888:8888
+      - 8888:8080
     networks:
       - dbnet
     init: true
@@ -48,7 +51,7 @@ services:
     depends_on:
       - database
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8888/ords"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/i/apex_version.txt"]
       interval: 30s
       timeout: 10s
       retries: 100
