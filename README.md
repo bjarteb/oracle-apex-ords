@@ -22,7 +22,6 @@ mkdir downloads
 
 ```bash
 tree downloads
-downloads
 downloads/
 ├── oracle-database-xe-18c-1.0-1.x86_64.rpm
 ├── apex_20.1.zip
