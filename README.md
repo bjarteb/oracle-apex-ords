@@ -71,7 +71,7 @@ popd
 
 ## Build ords app
 
-We will build on the work by @martindsouza
+We will build on the work by @martindsouza . ORDS in Standalone Mode
 
 ```bash
 git clone https://github.com/martindsouza/docker-ords.git
